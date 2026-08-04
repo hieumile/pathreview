@@ -46,7 +46,7 @@ None.
 
 ### Check-in 2 (end of week)
 
-**PR link:** https://github.com/ascherj/pathreview/pull/YOUR_PR_NUMBER_HERE
+**PR link:** https://github.com/ascherj/pathreview/pull/765
 
 **Branch:** `test/37-add-snapshot-tests-for-prompt-templates`
 
