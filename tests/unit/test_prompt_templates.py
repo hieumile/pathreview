@@ -1,6 +1,8 @@
 """Tests for prompt_templates.py - Snapshot tests"""
 
 import hashlib
+import os
+from pathlib import Path
 
 import pytest
 
@@ -189,13 +191,7 @@ class TestPromptTemplates:
         assert template_default == template_v1
 
     def test_template_snapshot_content_hash(self):
-        """Snapshot test: verify template content hash.
-
-        GAP / REPRODUCTION NOTE:
-        This test currently does not compare the generated MD5 hash against a stored expected value.
-        It only asserts that `content_hash` is a 32-character string. If any template content is
-        modified without a version bump, the hash changes, but this test still passes.
-        """
+        """Snapshot test: verify template content hash."""
         # Create hash of all template content
         template_content = ""
         for name in sorted(PROMPT_TEMPLATES.keys()):
@@ -206,8 +202,36 @@ class TestPromptTemplates:
 
         # Expected hash - update if templates intentionally change
         # This helps detect unintended changes to templates
-        assert isinstance(content_hash, str)
-        assert len(content_hash) == 32  # MD5 hash length
+        expected_hash = "3e79f974f8c1b6d8d1481dfc42e949ca"
+        assert content_hash == expected_hash, (
+            f"Global template content hash changed! Expected {expected_hash}, got {content_hash}.\n"
+            f"If this change was intentional, update the expected_hash in this test."
+        )
+
+    def test_template_snapshots(self):
+        """Verify that prompt templates match their saved snapshots on disk."""
+        snapshot_dir = Path(__file__).parent.parent / "snapshots" / "prompt_templates"
+        snapshot_dir.mkdir(parents=True, exist_ok=True)
+
+        update_snapshots = os.environ.get("UPDATE_SNAPSHOTS") == "1"
+
+        for name, versions in PROMPT_TEMPLATES.items():
+            for version, template_text in versions.items():
+                snapshot_file = snapshot_dir / f"{name}_{version}.txt"
+
+                # Normalize line endings to avoid OS-specific differences (LF vs CRLF)
+                normalized_text = template_text.replace("\r\n", "\n")
+
+                if update_snapshots or not snapshot_file.exists():
+                    snapshot_file.write_text(normalized_text, encoding="utf-8")
+
+                snapshot_content = snapshot_file.read_text(encoding="utf-8").replace("\r\n", "\n")
+
+                assert normalized_text == snapshot_content, (
+                    f"Snapshot mismatch for template '{name}' version '{version}'!\n"
+                    f"If intentional, run with UPDATE_SNAPSHOTS=1 to update the snapshots.\n"
+                    f"Otherwise, please revert your changes or bump the template version."
+                )
 
     def test_skills_feedback_requests_json_format(self):
         """Test skills_feedback requests JSON output."""
