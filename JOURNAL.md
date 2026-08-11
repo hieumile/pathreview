@@ -60,3 +60,34 @@ Modified [test_prompt_templates.py](file:///Users/leminhhieu/github/pathreview/t
 *(Note: Pre-existing failures exist in the codebase in other modules/tests, but our changes introduced no new failures).*
 
 **Draft PR feedback received from:** none
+
+## Week 10 — Iteration & reflection
+
+### Reviewer feedback
+
+**Feedback received:** [ ] Yes  [X] No — still awaiting review
+
+**Summary of feedback:**
+Still awaiting review from the maintainers.
+
+**How you responded:**
+N/A
+
+---
+
+### Reflection
+
+**What was harder than you expected?**
+Configuring the `mypy` strict type checking rules in `pyproject.toml` to ignore test directories without disabling general strict type checking on main source code. The pre-commit hooks strict checking ran on test files but our test setup wasn't fully typed. Standardizing the mypy overrides solved this cleanly.
+
+**What did you learn about working in a large codebase?**
+You have to accept and document pre-existing test/lint failures without trying to refactor files outside your scope. Keeping your changes tightly scoped and verifying that your specific features don't introduce any new regressions is key to clean, reviewable PR contributions.
+
+**How did AI tools help — and where did they fall short?**
+AI was great at outlining templates and scaffolding files, but fell short in understanding local workspace nuances (such as pre-commit configs vs global check scripts). I had to manually debug the linting environment and design the exact file-based snapshot lookup logic to make the process completely reliable.
+
+**What would you do differently if you started over?**
+Set up the pre-commit linting checks early in the first week rather than at the PR stage. This would prevent surprises with tool configs (like mypy and black) later on and allow resolving configuration discrepancies during the initial setup phase.
+
+**What are you most proud of from this module?**
+The implementation of filesystem-based snapshots (`.txt` files under `tests/snapshots/`). Having readable text files instead of a single massive JSON dictionary makes visual reviews using `git diff` incredibly clear for reviewers to see prompt text modifications.
